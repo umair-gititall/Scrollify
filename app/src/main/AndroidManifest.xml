@@ -12,6 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Scrollify">
         <activity
+            android:name=".Accounts"
+            android:exported="false" />
+        <activity
+            android:name=".StartupPage"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
