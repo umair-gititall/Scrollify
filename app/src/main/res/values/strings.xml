@@ -2,4 +2,19 @@
     <string name="app_name">Scrollify</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="login">LOGIN</string>
+    <string name="signup">SIGN UP</string>
+    <string name="or_continue_with">Or continue with</string>
+    <string name="sign_in">SIGN IN</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="password">Password</string>
+    <string name="username">Username</string>
+    <string name="welcome_back_we_missed_you">Welcome Back we missed you</string>
+    <string name="welcome_back">Welcome Back!</string>
+    <string name="date_of_birth">Date of Birth</string>
+    <string name="email">Email</string>
+    <string name="free_forever_no_credit_card_needed">Free Forever. No Credit Card Needed</string>
+    <string name="get_started_free">Get Started Free!</string>
+    <string name="reset">Reset</string>
+    <string name="reset_password">Reset Password</string>
 </resources>

@@ -11,8 +11,6 @@ import androidx.fragment.app.FragmentTransaction;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
@@ -21,10 +19,10 @@ import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link Login#newInstance} factory method to
+ * Use the {@link ForgetPassword#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class Login extends Fragment {
+public class ForgetPassword extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -35,7 +33,7 @@ public class Login extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public Login() {
+    public ForgetPassword() {
         // Required empty public constructor
     }
 
@@ -45,11 +43,11 @@ public class Login extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment Login.
+     * @return A new instance of fragment ForgetPassword.
      */
     // TODO: Rename and change types and number of parameters
-    public static Login newInstance(String param1, String param2) {
-        Login fragment = new Login();
+    public static ForgetPassword newInstance(String param1, String param2) {
+        ForgetPassword fragment = new ForgetPassword();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -67,46 +65,32 @@ public class Login extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false);
+        return inflater.inflate(R.layout.fragment_forget_password, container, false);
     }
 
     Fragment frag;
     FragmentManager manager;
     FragmentTransaction transaction;
-    MaterialButton SignIn, SignUp;
-    TextInputEditText username, password;
-    TextView forget;
+    TextInputEditText email;
+    MaterialButton reset, SignIn;
     DatabaseHandler db;
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        email = view.findViewById(R.id.email);
+        reset = view.findViewById(R.id.reset);
         SignIn = view.findViewById(R.id.signin);
-        SignUp = view.findViewById(R.id.signup);
-        username = view.findViewById(R.id.username);
-        password = view.findViewById(R.id.password);
-        forget = view.findViewById(R.id.forget);
         db = new DatabaseHandler(getContext());
 
-        SignIn.setOnClickListener(v -> {
-
-            String USERNAME = Objects.requireNonNull(username.getText()).toString();
-            String PASSWORD = Objects.requireNonNull(password.getText()).toString();
-
-            db.login(USERNAME, PASSWORD);
+        reset.setOnClickListener(v ->{
+            db.resetPassword(Objects.requireNonNull(email.getText()).toString());
         });
-        SignUp.setOnClickListener(v ->{
-            frag = new Signup();
-            manager = requireActivity().getSupportFragmentManager();
-            transaction = manager.beginTransaction();
-            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-            transaction.replace(R.id.frame, frag);
-            transaction.commit();
-        });
-        forget.setOnClickListener(v ->{
-            frag = new ForgetPassword();
+        SignIn.setOnClickListener(v ->{
+            frag = new Login();
             manager = requireActivity().getSupportFragmentManager();
             transaction = manager.beginTransaction();
             transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);

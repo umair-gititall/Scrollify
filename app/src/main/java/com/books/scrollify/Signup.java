@@ -1,5 +1,7 @@
 package com.books.scrollify;
 
+import android.animation.Animator;
+import android.animation.ValueAnimator;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -12,6 +14,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
+
+import java.util.Calendar;
+import java.util.Objects;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -61,33 +74,91 @@ public class Signup extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_signup, container, false);
     }
 
-
     Fragment frag;
     FragmentManager manager;
     FragmentTransaction transaction;
-    Button signup;
+    MaterialButton SignUp, SignIn;
+    TextInputEditText username, email, password, dob;
+    TextView forget;
+    DatabaseHandler databaseHandler;
+    DatePicker datePicker;
+    Calendar cal;
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        signup = view.findViewById(R.id.signup);
+        SignUp = view.findViewById(R.id.signup);
+        SignIn = view.findViewById(R.id.signin);
+        datePicker = view.findViewById(R.id.calender);
+        username = view.findViewById(R.id.username);
+        cal = Calendar.getInstance();
+        email = view.findViewById(R.id.email);
+        password = view.findViewById(R.id.password);
+        forget = view.findViewById(R.id.forget);
+        dob = view.findViewById(R.id.dob);
+        databaseHandler = new DatabaseHandler(getContext());
 
-        signup.setOnClickListener(new View.OnClickListener() {
+        dob.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
-            public void onClick(View v) {
-                frag = new Login();
-                manager = getActivity().getSupportFragmentManager();
-                transaction = manager.beginTransaction();
-                transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-                transaction.replace(R.id.frame, frag);
-                transaction.commit();
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (dob.isFocused()) {
+                    dob.clearFocus();
+                    datePicker.setVisibility(View.VISIBLE);
+                    datePicker.setElevation(30);
+                    datePicker.animate().translationY(-40);
+
+                    datePicker.init(cal.get(Calendar.YEAR), cal.get(Calendar.MONTH), cal.get(Calendar.DAY_OF_MONTH), new DatePicker.OnDateChangedListener() {
+                        @Override
+                        public void onDateChanged(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                            datePicker.animate().translationY(30);
+                            datePicker.setElevation(-1);
+                            datePicker.setVisibility(View.GONE);
+                            StringBuilder date = new StringBuilder();
+                            date.append(dayOfMonth);
+                            date.append("/");
+                            date.append((monthOfYear + 1));
+                            date.append("/");
+                            date.append(year);
+                            dob.setText(date);
+                        }
+                    });
+                }
             }
+        });
+
+        SignUp.setOnClickListener(v -> {
+            String USERNAME = Objects.requireNonNull(username.getText()).toString();
+            String EMAIL = Objects.requireNonNull(email.getText()).toString();
+            String PASSWORD = Objects.requireNonNull(password.getText()).toString();
+            String DOB = Objects.requireNonNull(dob.getText()).toString();
+
+            if (USERNAME.isEmpty() || EMAIL.isEmpty() || PASSWORD.isEmpty() || DOB.isEmpty()) {
+                Toast.makeText(getContext(), "Enter Valid Data", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            databaseHandler.createUser(USERNAME, EMAIL, PASSWORD, DOB);
+        });
+        SignIn.setOnClickListener(v ->{
+            frag = new Login();
+            manager = requireActivity().getSupportFragmentManager();
+            transaction = manager.beginTransaction();
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            transaction.replace(R.id.frame, frag);
+            transaction.commit();
+        });
+        forget.setOnClickListener(v ->{
+            frag = new ForgetPassword();
+            manager = requireActivity().getSupportFragmentManager();
+            transaction = manager.beginTransaction();
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            transaction.replace(R.id.frame, frag);
+            transaction.commit();
         });
     }
 }
