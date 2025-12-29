@@ -1,7 +1,10 @@
 package com.books.scrollify;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,6 +24,7 @@ public class StartupPage extends AppCompatActivity {
     imagePreview imagepreview;
     textPreview textpreview;
     MaterialButton[] buttons = new MaterialButton[2];
+    SharedPreferences prefs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,6 +34,8 @@ public class StartupPage extends AppCompatActivity {
 
         buttons[0] = findViewById(R.id.login);
         buttons[1] = findViewById(R.id.signup);
+        prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
         imagepreview = new imagePreview(new int[]{
                 R.drawable.a1,
                 R.drawable.a2,

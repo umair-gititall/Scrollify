@@ -1,5 +1,6 @@
 package com.books.scrollify;
 
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -8,6 +9,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -95,7 +97,16 @@ public class Login extends Fragment {
             String USERNAME = Objects.requireNonNull(username.getText()).toString();
             String PASSWORD = Objects.requireNonNull(password.getText()).toString();
 
-            db.login(USERNAME, PASSWORD);
+            db.login(USERNAME, PASSWORD, result ->{
+                if(result)
+                {
+                    PreferenceManager.getDefaultSharedPreferences(getContext())
+                            .edit().putBoolean("logged in", true).apply();
+                    Intent i = new Intent(getActivity(), MainActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(i);
+                }
+            });
         });
         SignUp.setOnClickListener(v ->{
             frag = new Signup();

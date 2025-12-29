@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Scrollify">
         <activity
+            android:name=".HomePage"
+            android:exported="false" />
+        <activity
             android:name=".Accounts"
             android:exported="false" />
         <activity

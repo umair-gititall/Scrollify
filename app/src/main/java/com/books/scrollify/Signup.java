@@ -2,6 +2,7 @@ package com.books.scrollify;
 
 import android.animation.Animator;
 import android.animation.ValueAnimator;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -10,6 +11,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -142,7 +144,15 @@ public class Signup extends Fragment {
                 Toast.makeText(getContext(), "Enter Valid Data", Toast.LENGTH_SHORT).show();
                 return;
             }
-            databaseHandler.createUser(USERNAME, EMAIL, PASSWORD, DOB);
+            databaseHandler.createUser(USERNAME, EMAIL, PASSWORD, DOB, result -> {
+                if(result) {
+                    PreferenceManager.getDefaultSharedPreferences(getContext())
+                            .edit().putBoolean("logged in", true).apply();
+                    Intent i = new Intent(getActivity(), MainActivity.class);
+                    i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(i);
+                }
+            });
         });
         SignIn.setOnClickListener(v ->{
             frag = new Login();
