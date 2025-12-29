@@ -48,9 +48,9 @@ public class StartupPage extends AppCompatActivity {
         }, findViewById(R.id.preview));
 
         textpreview = new textPreview(new String[]{
-                "Let's Get Started...",
-                "Let's Play this Game...",
-                "Abdullah is here..."
+                "Welcome to your reading space",
+                "Stories are waiting for you",
+                "Let’s turn the first page"
         }, findViewById(R.id.textbox));
 
         imagepreview.load();

@@ -1,5 +1,8 @@
 package com.books.scrollify;
 
+import android.content.SharedPreferences;
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -7,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +37,12 @@ public class AddBook extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    private Book book;
+
+
+    public AddBook(Book book) {
+        this.book = book;
+    }
 
     public AddBook() {
         // Required empty public constructor
@@ -77,6 +87,18 @@ public class AddBook extends Fragment {
     MaterialButton apply;
     DatabaseHandler db;
     Boolean Control = true;
+    SharedPreferences prefs;
+    int image;
+    int[] images = new int[]{
+            R.drawable.a1,
+            R.drawable.a2,
+            R.drawable.a3,
+            R.drawable.a4,
+            R.drawable.a5,
+            R.drawable.a6,
+            R.drawable.a7,
+            R.drawable.a8};
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
@@ -92,6 +114,27 @@ public class AddBook extends Fragment {
 
         apply = requireActivity().findViewById(R.id.add);
         db = new DatabaseHandler(getContext());
+        prefs = PreferenceManager.getDefaultSharedPreferences(requireContext());
+
+        image = prefs.getInt("images", 0);
+        imagePreview temp = new imagePreview(new int[]{images[image]}, view.findViewById(R.id.bookBackground));
+        temp.load();
+
+        if (book != null) {
+            Title.setText(book.Title);
+            title.setText(book.Title);
+
+            Author.setText(book.AuthorName);
+            author.setText(book.AuthorName);
+
+            ISBNn.setText(book.ISBN);
+            ISBN.setText(book.ISBN);
+            ISBNn.setEnabled(false);
+
+            Year.setText(String.valueOf(book.Year));
+            year.setText(String.valueOf(book.Year));
+            temp.images[0] = book.Image;
+        }
 
         view.post(new Runnable() {
             @Override
@@ -119,18 +162,37 @@ public class AddBook extends Fragment {
         apply.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                if(apply.getText().equals("Save"))
-                {
-                    if(Title.getText().toString().isEmpty() || Author.getText().toString().isEmpty()
-                    || ISBNn.getText().toString().isEmpty() || Year.getText().toString().isEmpty())
+                if (apply.getText().equals("Save") && book == null) {
+                    if (Title.getText().toString().isEmpty() || Author.getText().toString().isEmpty()
+                            || ISBNn.getText().toString().isEmpty() || Year.getText().toString().isEmpty()) {
+                        Toast.makeText(getContext(), "Fill in the Fields", Toast.LENGTH_SHORT).show();
                         return true;
+                    }
                     db.addBook(new Book(Title.getText().toString(),
                             Author.getText().toString(),
                             ISBNn.getText().toString(),
-                            Integer.valueOf(Year.getText().toString()), R.drawable.a1));
-
+                            Integer.valueOf(Year.getText().toString()), images[image]), result ->{
+                        if(result) {
+                            prefs.edit().putInt("images", (++image) % 8).apply();
+                            prefs.edit().putBoolean("updated", true).apply();
+                            getParentFragmentManager().popBackStack();
+                        }
+                    });
+                } else {
+                    if (Title.getText().toString().isEmpty() || Author.getText().toString().isEmpty()
+                            || ISBNn.getText().toString().isEmpty() || Year.getText().toString().isEmpty()) {
+                        Toast.makeText(getContext(), "Fill in the Fields", Toast.LENGTH_SHORT).show();
+                        return true;
+                    }
+                    book.Title = Title.getText().toString();
+                    book.AuthorName = Author.getText().toString();
+                    book.ISBN = ISBNn.getText().toString();
+                    book.Year = Integer.valueOf(Year.getText().toString());
+                    db.updateBook(book);
+                    prefs.edit().putBoolean("updated", true).apply();
                     getParentFragmentManager().popBackStack();
                 }
+
                 return true;
             }
         });
@@ -138,13 +200,11 @@ public class AddBook extends Fragment {
         getParentFragmentManager().addOnBackStackChangedListener(new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
-                if(Control) {
+                if (Control) {
                     apply.setText("Save");
                     Control = false;
-                }
-                else
+                } else
                     apply.setText("Add Book");
-
             }
         });
     }

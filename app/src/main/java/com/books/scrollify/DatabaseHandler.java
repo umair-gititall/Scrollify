@@ -7,6 +7,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.google.firebase.Firebase;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserInfo;
@@ -15,8 +17,11 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.WriteBatch;
+import com.google.firebase.firestore.auth.User;
 
 import org.w3c.dom.Document;
 
@@ -95,7 +100,7 @@ public class DatabaseHandler {
                     });
                 } else {
                     output.onCheck(false);
-                    Toast.makeText(context, "Email Not Found", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(context, "Account Not Found", Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -106,12 +111,14 @@ public class DatabaseHandler {
     }
 
     public void resetPassword(String email) {
-        mAuth.sendPasswordResetEmail(email).addOnFailureListener(result -> {
-            Toast.makeText(context, result.getMessage(), Toast.LENGTH_SHORT).show();
-        });
-    }
 
-    public void deleteAccount(String email) {
+        mAuth.sendPasswordResetEmail(email).addOnCompleteListener(result -> {
+            if(!result.isSuccessful())
+                Toast.makeText(context,"Email Not Found", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(context,"Password Reset Email Sent", Toast.LENGTH_SHORT).show();
+
+        });
     }
 
     public interface checkUser {
@@ -133,11 +140,27 @@ public class DatabaseHandler {
         });
     }
 
-    public void addBook(Book book) {
+    public interface bookAdded{
+        void added(Boolean status);
+    }
+    public void addBook(Book book, bookAdded callback) {
         assert mAuth.getCurrentUser() != null;
-        store.collection(mAuth.getCurrentUser().getUid()).document(book.ISBN).set(book).addOnCompleteListener(result -> {
-            if (!result.isSuccessful())
-                Toast.makeText(context, Objects.requireNonNull(result.getException()).getMessage(), Toast.LENGTH_SHORT).show();
+        store.collection(mAuth.getCurrentUser().getUid()).document(book.ISBN).get().addOnSuccessListener(result -> {
+
+            if (result.exists()) {
+                Toast.makeText(context, "ISBN Already Exists", Toast.LENGTH_SHORT).show();
+                callback.added(false);
+                return;
+            }
+            assert mAuth.getCurrentUser() != null;
+            store.collection(mAuth.getCurrentUser().getUid()).document(book.ISBN).set(book).addOnCompleteListener(result2 -> {
+                if (!result2.isSuccessful()) {
+                    Toast.makeText(context, Objects.requireNonNull(result2.getException()).getMessage(), Toast.LENGTH_SHORT).show();
+                    callback.added(false);
+                    return;
+                }
+                callback.added(true);
+            });
         });
     }
 
@@ -146,6 +169,7 @@ public class DatabaseHandler {
     }
 
     public void getBooks(getBooks callback) {
+        assert mAuth.getCurrentUser() != null;
         store.collection(mAuth.getCurrentUser().getUid()).get().addOnCompleteListener(result -> {
             if (!result.isSuccessful()) {
                 Toast.makeText(context, Objects.requireNonNull(result.getException()).getMessage(), Toast.LENGTH_SHORT).show();
@@ -162,17 +186,61 @@ public class DatabaseHandler {
         });
     }
 
-    public static class user {
-        public String username, dob, email;
+    public void deleteBook(String ISBN) {
+        assert mAuth.getCurrentUser() != null;
+        store.collection(mAuth.getCurrentUser().getUid()).document(ISBN).get().addOnSuccessListener(result -> {
+            result.getReference().delete();
+            Toast.makeText(context, "Deleted Book: " + result.get("Title"), Toast.LENGTH_SHORT).show();
+        });
+    }
 
-        public user() {
-        }
+    public void updateBook(Book book) {
+        assert mAuth.getCurrentUser() != null;
+        store.collection(mAuth.getCurrentUser().getUid()).document(book.ISBN).set(book).addOnCompleteListener(result -> {
+            if (!result.isSuccessful())
+                Toast.makeText(context, Objects.requireNonNull(result.getException()).getMessage(), Toast.LENGTH_SHORT).show();
+        });
+    }
 
-        public user(String username, String dob, String email) {
-            this.username = username;
-            this.dob = dob;
-            this.email = email;
+    public interface deleteStatus {
+        void status(Boolean s);
+    }
+
+    public void deleteAccount(String password, deleteStatus callback) {
+        FirebaseUser User = mAuth.getCurrentUser();
+
+        if (User != null) {
+            AuthCredential credential = EmailAuthProvider.getCredential(Objects.requireNonNull(User.getEmail()), password);
+            User.reauthenticate(credential).addOnCompleteListener(result -> {
+                if (!result.isSuccessful()) {
+                    Toast.makeText(context, Objects.requireNonNull(result.getException()).getMessage(), Toast.LENGTH_SHORT).show();
+                    callback.status(false);
+                    return;
+                }
+                store.collection(User.getUid()).get().addOnSuccessListener(result2 -> {
+                    WriteBatch batch  = store.batch();
+                    for (DocumentSnapshot d : result2.getDocuments())
+                        batch.delete(d.getReference());
+
+                    batch.commit().addOnCompleteListener(result3 ->{
+                        if(result3.isSuccessful()) {
+                            db.child("USERS").child(User.getUid()).child("username").get().addOnSuccessListener(result4 -> {
+                                db.child("EMAILS").child(Objects.requireNonNull(result4.getValue(String.class))).setValue(null);
+                                db.child("USERS").child(User.getUid()).setValue(null);
+                                User.delete();
+                            });
+                            callback.status(true);
+                        }
+                        else
+                            Toast.makeText(context, Objects.requireNonNull(result3.getException()).getMessage(), Toast.LENGTH_SHORT).show();
+                    });
+                });
+            });
         }
     }
 
+    public void logOut() {
+        mAuth.signOut();
+    }
 }
+

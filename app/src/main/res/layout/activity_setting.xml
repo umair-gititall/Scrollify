@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clipChildren="false"
+    tools:context=".Setting"
+    android:background="@color/white">
+
+
+    <ImageView
+        android:id="@+id/preview"
+        android:layout_width="200dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="30dp"
+        android:layout_above="@+id/home"
+        android:src="@drawable/a11"
+        android:scaleType="centerCrop"
+        android:layout_alignParentEnd="true"
+        android:contentDescription="@string/app_name"/>
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/fields"
+        android:layout_width="match_parent"
+        android:layout_height="640dp"
+        android:layout_alignParentBottom="true"
+        app:cardElevation="30dp"
+        app:shapeAppearanceOverlay="@style/TopRoundedCard">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:ignore="UselessParent">
+
+            <TextView
+                android:id="@+id/Settings"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="20dp"
+                android:fontFamily="serif"
+                android:text="@string/settings"
+                android:textSize="38sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/SettingsMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/Settings"
+                android:layout_centerHorizontal="true"
+                android:text="We Missed You"
+                android:textSize="14sp"
+                android:layout_marginBottom="20dp"/>
+
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/logout"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_below="@+id/SettingsMessage"
+                android:layout_marginHorizontal="52dp"
+                android:layout_marginBottom="14dp"
+                android:text="@string/logout"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="18dp" />
+
+            <LinearLayout
+                android:id="@+id/continuewith"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/logout"
+                android:layout_marginHorizontal="70dp"
+                android:layout_marginBottom="10dp"
+                android:gravity="center">
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/fadingline" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="10dp"
+                    android:text="@string/or_continue_with"
+                    android:textSize="12sp" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/fadingline"
+                    android:rotationY="180" />
+            </LinearLayout>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/continuewith"
+                android:layout_marginHorizontal="60dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/delete"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:backgroundTint="@android:color/transparent"
+                    android:text="Delete Account"
+                    android:textColor="@android:color/holo_red_dark"
+                    app:cornerRadius="14dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:strokeColor="@android:color/holo_red_dark"
+                    app:strokeWidth="2dp"
+                    tools:ignore="RtlSymmetry" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </RelativeLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+</RelativeLayout>

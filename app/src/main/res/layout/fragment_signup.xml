@@ -15,7 +15,9 @@
         android:background="?attr/colorBackgroundFloating"
         android:elevation="-1dp"
         android:translationY="30dp"
-        android:visibility="gone" />
+        android:visibility="gone"
+        android:maxDate="2007-12-29"
+        />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -97,10 +99,12 @@
                 app:boxCornerRadiusTopEnd="14dp"
                 app:boxCornerRadiusTopStart="14dp"
                 app:boxStrokeWidth="2dp"
+                app:passwordToggleEnabled="true"
                 app:boxStrokeWidthFocused="3dp">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/password"
+                    android:inputType="textPassword"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="@string/password" />

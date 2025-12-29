@@ -1,6 +1,11 @@
 package com.books.scrollify;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -9,10 +14,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.preference.PreferenceManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -72,6 +80,7 @@ public class Home extends Fragment {
     RecyclerView recyclerView;
     DatabaseHandler db;
     Book[] books;
+    SharedPreferences prefs;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -79,21 +88,41 @@ public class Home extends Fragment {
         recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         db = new DatabaseHandler(getContext());
+        prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 
+        if (prefs.getBoolean("updated", false))
+            runit();
+        else
+            savedRunit();
 
-        db.getBooks(result -> {
-            books = new Book[result.size()];
+    }
 
-            for(int i = 0;i<books.length;i++)
-                books[i] = result.get(i);
+    public void savedRunit() {
+        String data = prefs.getString("data", null);
 
-            RVAdapter adapter = new RVAdapter(books);
-
+        if (data != null) {
+            List<Book> books;
+            Gson gson = new Gson();
+            Type type = new TypeToken<List<Book>>() {
+            }.getType();
+            books = gson.fromJson(data, type);
+            RVAdapter adapter = new RVAdapter(books, getContext(), getParentFragmentManager());
             PagerSnapHelper snapper = new PagerSnapHelper();
             snapper.attachToRecyclerView(recyclerView);
+            recyclerView.setAdapter(adapter);
+        }
+    }
 
+    public void runit() {
+        db.getBooks(result -> {
+            RVAdapter adapter = new RVAdapter(result, getContext(), getParentFragmentManager());
+            PagerSnapHelper snapper = new PagerSnapHelper();
+            snapper.attachToRecyclerView(recyclerView);
+            Gson gson = new Gson();
+            String json = gson.toJson(result);
+            prefs.edit().putString("data", json).apply();
+            prefs.edit().putBoolean("updated", false).apply();
             recyclerView.setAdapter(adapter);
         });
-
     }
 }

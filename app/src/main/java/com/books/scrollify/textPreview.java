@@ -8,6 +8,9 @@ public class textPreview{
     int textLoad = 0, loadedString = 0;
     StringBuilder builder = new StringBuilder();
     Boolean controller = false;
+    boolean blinking = false;
+    boolean cursorVisible = true;
+    int blinkCount = 0;
 
     public textPreview(String[] text, TextView preview)
     {
@@ -18,7 +21,9 @@ public class textPreview{
         textbox.post(new Runnable() {
             @Override
             public void run() {
-                if (controller) clear();
+                if(blinking)
+                    blinkCursor();
+                else if (controller) clear();
                 else write();
                 textbox.postDelayed(this, 70);
             }
@@ -28,10 +33,23 @@ public class textPreview{
         builder.append(textData[loadedString].charAt(textLoad++));
         textbox.setText(builder + "|");
         if (textLoad == textData[loadedString].length()) {
-            controller = true;
+            blinking = true;
+            blinkCount = 0;
         }
     }
 
+    public void blinkCursor() {
+        if(blinkCount % 3 == 0)
+            cursorVisible = !cursorVisible;
+        textbox.setText(builder + (cursorVisible ? "|" : ""));
+
+        blinkCount++;
+        if (blinkCount >= 14) {
+            blinking = false;
+            controller = true;
+            cursorVisible = true;
+        }
+    }
     public void clear() {
         if (textLoad == 1) {
             controller = false;

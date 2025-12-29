@@ -12,7 +12,6 @@
         android:id="@+id/bookBackground"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:alpha="0.4"
         android:contentDescription="@string/app_name"
         android:scaleType="centerCrop"
         android:src="@drawable/frost" />
@@ -33,6 +32,7 @@
         app:strokeWidth="3dp">
 
         <ImageView
+            android:id="@+id/background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:scaleType="centerCrop"
@@ -99,6 +99,7 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/ISBNn"
+                    android:inputType="number"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="ISBN" />
@@ -118,6 +119,7 @@
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/Year"
+                    android:inputType="number"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Publication Year" />

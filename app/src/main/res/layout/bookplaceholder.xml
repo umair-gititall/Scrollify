@@ -83,7 +83,7 @@
 
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/edit"
+        android:id="@+id/delete"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:layout_alignParentBottom="true"
@@ -99,7 +99,7 @@
         tools:ignore="RtlSymmetry" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/delete"
+        android:id="@+id/edit"
         android:layout_width="wrap_content"
         android:layout_height="60dp"
         android:layout_alignParentEnd="true"
