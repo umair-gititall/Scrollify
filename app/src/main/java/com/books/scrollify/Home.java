@@ -10,6 +10,7 @@ import com.google.gson.reflect.TypeToken;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.PagerSnapHelper;
 import androidx.recyclerview.widget.RecyclerView;
@@ -81,6 +82,7 @@ public class Home extends Fragment {
     DatabaseHandler db;
     Book[] books;
     SharedPreferences prefs;
+    FragmentManager manager;
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -89,6 +91,7 @@ public class Home extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
         db = new DatabaseHandler(getContext());
         prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+        manager = getParentFragmentManager();
 
         if (prefs.getBoolean("updated", false))
             runit();
@@ -98,6 +101,7 @@ public class Home extends Fragment {
     }
 
     public void savedRunit() {
+        Toast.makeText(getContext(), "saved", Toast.LENGTH_SHORT).show();
         String data = prefs.getString("data", null);
 
         if (data != null) {
@@ -106,7 +110,7 @@ public class Home extends Fragment {
             Type type = new TypeToken<List<Book>>() {
             }.getType();
             books = gson.fromJson(data, type);
-            RVAdapter adapter = new RVAdapter(books, getContext(), getParentFragmentManager());
+            RVAdapter adapter = new RVAdapter(books, getContext(), manager);
             PagerSnapHelper snapper = new PagerSnapHelper();
             snapper.attachToRecyclerView(recyclerView);
             recyclerView.setAdapter(adapter);
@@ -115,7 +119,8 @@ public class Home extends Fragment {
 
     public void runit() {
         db.getBooks(result -> {
-            RVAdapter adapter = new RVAdapter(result, getContext(), getParentFragmentManager());
+            Toast.makeText(getContext(), "online", Toast.LENGTH_SHORT).show();
+            RVAdapter adapter = new RVAdapter(result, getContext(), manager);
             PagerSnapHelper snapper = new PagerSnapHelper();
             snapper.attachToRecyclerView(recyclerView);
             Gson gson = new Gson();

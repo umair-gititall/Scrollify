@@ -37,6 +37,7 @@ public class HomePage extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home_page);
+
         addBook = findViewById(R.id.add);
         settings = findViewById(R.id.settings);
         editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
@@ -61,12 +62,15 @@ public class HomePage extends AppCompatActivity {
         }, findViewById(R.id.message));
 
         textpreview.run();
-        frag = new Home();
-        manager = getSupportFragmentManager();
-        transaction = manager.beginTransaction();
-        transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
-        transaction.replace(R.id.frame, frag);
-        transaction.commit();
+
+        if(savedInstanceState == null) {
+            frag = new Home();
+            manager = getSupportFragmentManager();
+            transaction = manager.beginTransaction();
+            transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE);
+            transaction.replace(R.id.frame, frag);
+            transaction.commit();
+        }
 
         addBook.setOnClickListener(v -> {
             if(addBook.getText().equals("Add Book")) {
